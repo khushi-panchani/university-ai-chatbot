@@ -14,7 +14,7 @@ client = genai.Client(api_key=api_key)
 
 # Step 4: Ask Gemini a question
 response = client.models.generate_content(
-    model = "gemini-3.5-flash-lite",
+    model="gemini-3.6-flash",
     contents="What is an Entity in DBMS? Explain simply."
 )
 
