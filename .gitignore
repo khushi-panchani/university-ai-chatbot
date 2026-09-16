@@ -1,4 +1,13 @@
+# Virtual environments
 venv/
+venv312/
+
+# Python cache
 __pycache__/
+*.pyc
+
+# Environment variables and API keys
 .env
+
+# Data files
 data/
