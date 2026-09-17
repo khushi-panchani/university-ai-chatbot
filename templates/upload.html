@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Upload PDF | University AI Chatbot</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="chat-container">
+
+        <div class="logo">
+            🤖
+        </div>
+
+        <h1>University AI Chatbot</h1>
+
+        <p class="subtitle">
+            Upload your notes and learn with AI.
+        </p>
+
+        <form action="/upload"
+              method="POST"
+              enctype="multipart/form-data">
+
+            <div class="upload-box">
+
+                <h3>📄 Upload Your PDF</h3>
+
+                <p>
+                    Select your university notes to start asking questions.
+                </p>
+
+                <input
+                    type="file"
+                    name="pdf_file"
+                    accept=".pdf"
+                    required
+                >
+
+                <button type="submit">
+                    Upload PDF 🚀
+                </button>
+
+            </div>
+
+        </form>
+
+        <p class="footer">
+            Powered by RAG, FAISS and Gemini AI
+        </p>
+
+    </div>
+
+</body>
+
+</html>

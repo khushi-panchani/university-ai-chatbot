@@ -3,27 +3,44 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>University AI Chatbot</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-    <h1>University AI Chatbot</h1>
+    <div class="chat-container">
 
-    <p>Ask questions from your university notes.</p>
+        <h1>University AI Chatbot</h1>
 
-    <input
-        type="text"
-        id="question"
-        placeholder="Enter your question"
-    >
+        <p>Ask questions from your university notes.</p>
 
-    <button onclick="askQuestion()">
-        Send
-    </button>
+        <div class="input-area">
+
+            <input
+                type="text"
+                id="question"
+                placeholder="Enter your question"
+            >
+
+            <button onclick="askQuestion()">Send</button>
+
+        </div>
+
+        <!-- Answer will appear here -->
+        <div id="answer-box">
+
+            <h3>Bot Answer:</h3>
+
+            <p id="answer">Your answer will appear here...</p>
+
+        </div>
+
+    </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 

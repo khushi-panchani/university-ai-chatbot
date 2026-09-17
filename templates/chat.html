@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ask Questions | University AI Chatbot</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="chat-container">
+
+        <div class="logo">
+            🤖
+        </div>
+
+        <h1>University AI Chatbot</h1>
+
+        <p class="subtitle">
+            Ask questions from your uploaded PDF.
+        </p>
+
+        <div class="input-area">
+
+            <input type="text" id="question" placeholder="What would you like to learn?">
+
+            <button id="send-button" onclick="askQuestion()">
+                Send
+            </button>
+
+        </div>
+
+        <div id="answer-box">
+
+            <h3>🤖 Bot Answer</h3>
+
+            <div id="answer">
+                Your answer will appear here...
+            </div>
+
+        </div>
+
+        <button onclick="window.location.href='/'" style="margin-top: 20px; background: #64748b;">
+            Upload New PDF
+        </button>
+
+        <p class="footer">
+            Answers are generated from your uploaded notes.
+        </p>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>
