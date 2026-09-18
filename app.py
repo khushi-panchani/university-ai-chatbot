@@ -108,15 +108,18 @@ def chat_page():
 def ask_question():
 
     try:
-
         data = request.get_json()
+
+        if not data:
+            return jsonify({
+                "error": "No data received."
+            }), 400
 
         question = data.get("question", "").strip()
 
         if not question:
-
             return jsonify({
-                "answer": "Please enter a question."
+                "error": "Please enter a question."
             }), 400
 
         print("Question received:", question)
@@ -131,20 +134,13 @@ def ask_question():
 
     except Exception as error:
 
-        print("ERROR IN /ask ROUTE:", error)
-
-        error_message = str(error)
-
-        if "RESOURCE_EXHAUSTED" in error_message:
-
-            return jsonify({
-                "answer":
-                "Gemini API quota exceeded. Please try again later."
-            }), 429
+        print("\n========== ERROR IN /ask ROUTE ==========")
+        print(type(error).__name__)
+        print(error)
+        print("=========================================\n")
 
         return jsonify({
-            "answer":
-            "Something went wrong. Please check the Flask terminal."
+            "error": f"{type(error).__name__}: {str(error)}"
         }), 500
 
 
@@ -152,10 +148,13 @@ def ask_question():
 # RUN APPLICATION
 # --------------------------------------------------
 
+print("App.py reached the run section")
 if __name__ == "__main__":
 
+    port = int(os.environ.get("PORT", 5000))
+
     app.run(
-        debug=False,
-        host="127.0.0.1",
-        port=5000
+        host="0.0.0.0",
+        port=port,
+        debug=False
     )

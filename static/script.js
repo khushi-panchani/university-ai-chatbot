@@ -3,7 +3,6 @@ console.log("script.js loaded successfully");
 let thinkingInterval;
 let thinkingMessageInterval;
 
-
 async function askQuestion() {
 
     const questionInput = document.getElementById("question");
@@ -29,6 +28,7 @@ async function askQuestion() {
     let messageIndex = 0;
     let dotCount = 0;
 
+    // Show thinking animation
     answerElement.innerHTML = `
         <div class="ai-thinking">
 
@@ -39,7 +39,6 @@ async function askQuestion() {
                 </div>
 
                 <div>
-
                     <div class="thinking-title">
                         AI is thinking<span class="title-dots"></span>
                     </div>
@@ -47,7 +46,6 @@ async function askQuestion() {
                     <div class="thinking-message">
                         Reading your notes
                     </div>
-
                 </div>
 
             </div>
@@ -69,7 +67,7 @@ async function askQuestion() {
     const titleDots =
         document.querySelector(".title-dots");
 
-
+    // Animate title dots
     thinkingInterval = setInterval(() => {
 
         dotCount = (dotCount + 1) % 4;
@@ -80,7 +78,7 @@ async function askQuestion() {
 
     }, 400);
 
-
+    // Change thinking messages
     thinkingMessageInterval = setInterval(() => {
 
         messageIndex =
@@ -93,11 +91,9 @@ async function askQuestion() {
 
     }, 1800);
 
-
     try {
 
         const response = await fetch("/ask", {
-
             method: "POST",
 
             headers: {
@@ -107,30 +103,36 @@ async function askQuestion() {
             body: JSON.stringify({
                 question: question
             })
-
         });
-
 
         const data = await response.json();
 
-        if (!response.ok) {
+        // Stop animation before displaying the answer
+        clearInterval(thinkingInterval);
+        clearInterval(thinkingMessageInterval);
+
+        // Display successful answer
+        if (response.ok && data.answer) {
+
+            answerElement.innerHTML = marked.parse(data.answer);
+
+        } else if (data.error) {
+
+            answerElement.textContent = data.error;
+
+        } else {
 
             answerElement.textContent =
-                data.answer || "Something went wrong.";
+                "No answer received from the server.";
 
-            return;
         }
-
-        // Convert Markdown response into properly formatted HTML
-        answerElement.innerHTML = marked.parse(data.answer);
-
 
     } catch (error) {
 
         console.error("Error:", error);
 
         answerElement.textContent =
-            "Something went wrong. Please check the Flask terminal.";
+            "Unable to connect to the Flask server.";
 
     } finally {
 
