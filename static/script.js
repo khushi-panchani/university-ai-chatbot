@@ -3,9 +3,8 @@ console.log("script.js loaded successfully");
 let thinkingInterval;
 let thinkingMessageInterval;
 
-async function askQuestion() {
 
-    console.log("Send button clicked");
+async function askQuestion() {
 
     const questionInput = document.getElementById("question");
     const answerElement = document.getElementById("answer");
@@ -40,13 +39,15 @@ async function askQuestion() {
                 </div>
 
                 <div>
+
                     <div class="thinking-title">
-                        AI is thinking<span id="title-dots">...</span>
+                        AI is thinking<span class="title-dots"></span>
                     </div>
 
-                    <div id="thinking-message" class="thinking-message">
+                    <div class="thinking-message">
                         Reading your notes
                     </div>
+
                 </div>
 
             </div>
@@ -63,32 +64,37 @@ async function askQuestion() {
     `;
 
     const thinkingMessage =
-        document.getElementById("thinking-message");
+        document.querySelector(".thinking-message");
 
     const titleDots =
-        document.getElementById("title-dots");
+        document.querySelector(".title-dots");
+
 
     thinkingInterval = setInterval(() => {
 
         dotCount = (dotCount + 1) % 4;
 
-        titleDots.textContent = ".".repeat(dotCount);
+        if (titleDots) {
+            titleDots.textContent = ".".repeat(dotCount);
+        }
 
     }, 400);
+
 
     thinkingMessageInterval = setInterval(() => {
 
         messageIndex =
             (messageIndex + 1) % thinkingMessages.length;
 
-        thinkingMessage.textContent =
-            thinkingMessages[messageIndex];
+        if (thinkingMessage) {
+            thinkingMessage.textContent =
+                thinkingMessages[messageIndex];
+        }
 
     }, 1800);
 
-    try {
 
-        console.log("Sending question to Flask...");
+    try {
 
         const response = await fetch("/ask", {
 
@@ -104,17 +110,20 @@ async function askQuestion() {
 
         });
 
-        console.log("Response received:", response.status);
-
-        if (!response.ok) {
-            throw new Error("Flask error: " + response.status);
-        }
 
         const data = await response.json();
 
-        console.log("Answer received:", data);
+        if (!response.ok) {
 
-        answerElement.textContent = data.answer;
+            answerElement.textContent =
+                data.answer || "Something went wrong.";
+
+            return;
+        }
+
+        // Convert Markdown response into properly formatted HTML
+        answerElement.innerHTML = marked.parse(data.answer);
+
 
     } catch (error) {
 
@@ -131,4 +140,5 @@ async function askQuestion() {
         sendButton.disabled = false;
 
     }
+
 }

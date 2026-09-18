@@ -435,3 +435,60 @@ button:disabled {
 
     transform: none;
 }
+
+#answer {
+    line-height: 1.7;
+    text-align: left;
+}
+
+#answer h3 {
+    color: #1e3a8a;
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+#answer h4 {
+    color: #1e3a8a;
+    margin-top: 16px;
+}
+
+#answer p {
+    margin: 10px 0;
+}
+
+#answer ul,
+#answer ol {
+    margin-left: 25px;
+    margin-bottom: 15px;
+}
+
+#answer li {
+    margin-bottom: 8px;
+}
+
+#answer strong {
+    color: #1e3a8a;
+}
+
+#answer code {
+    background: #e2e8f0;
+    padding: 3px 6px;
+    border-radius: 5px;
+    font-family: Consolas, monospace;
+}
+
+#answer pre {
+    background: #1e293b;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin-top: 12px;
+    margin-bottom: 15px;
+}
+
+#answer pre code {
+    background: transparent;
+    color: white;
+    padding: 0;
+}

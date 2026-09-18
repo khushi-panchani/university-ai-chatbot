@@ -2,12 +2,17 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Ask Questions | University AI Chatbot</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
 </head>
 
 <body>
@@ -26,9 +31,16 @@
 
         <div class="input-area">
 
-            <input type="text" id="question" placeholder="What would you like to learn?">
+            <input
+                type="text"
+                id="question"
+                placeholder="What would you like to learn?"
+            >
 
-            <button id="send-button" onclick="askQuestion()">
+            <button
+                id="send-button"
+                onclick="askQuestion()"
+            >
                 Send
             </button>
 
@@ -44,7 +56,10 @@
 
         </div>
 
-        <button onclick="window.location.href='/'" style="margin-top: 20px; background: #64748b;">
+        <button
+            onclick="window.location.href='/'"
+            style="margin-top: 20px; background: #64748b;"
+        >
             Upload New PDF
         </button>
 
@@ -53,6 +68,7 @@
         </p>
 
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 
