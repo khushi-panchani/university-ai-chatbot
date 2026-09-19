@@ -1,18 +1,31 @@
+
+
 from sentence_transformers import SentenceTransformer
 
+# Model will be loaded only when needed
+model = None
 
-# Step 1: Load the pretrained embedding model
-model = SentenceTransformer("all-MiniLM-L6-v2")
+
+def get_embedding_model():
+    global model
+
+    if model is None:
+        print("Loading embedding model...")
+        model = SentenceTransformer(
+            "all-MiniLM-L6-v2",
+            device="cpu"
+        )
+        print("Embedding model loaded successfully!")
+
+    return model
 
 
-# Step 2: Create a function to convert text into embeddings
 def create_embedding(text):
+    embedding_model = get_embedding_model()
 
-    embedding = model.encode(text)
+    embedding = embedding_model.encode(text)
 
     return embedding
-
-
 
 
 # from sentence_transformers import SentenceTransformer

@@ -5,7 +5,7 @@ from google import genai
 
 from src.pdf_loader import extract_text_from_pdf
 from src.text_chunker import split_text_into_chunks
-from src.embedding_model import model
+from src.embedding_model import get_embedding_model
 from src.vector_store import (
     create_vector_index,
     search_vector_index
@@ -49,7 +49,8 @@ def load_pdf(pdf_path):
 
     print("Generating embeddings...")
 
-    embeddings = model.encode(chunks)
+    embedding_model = get_embedding_model()
+    embeddings = embedding_model.encode(chunks)
 
     print("Embeddings generated successfully!")
 
@@ -79,7 +80,8 @@ def get_answer(question):
         return "Please upload a PDF first."
 
     # Convert the question into an embedding
-    query_embedding = model.encode([question])
+    embedding_model = get_embedding_model()
+    query_embedding = embedding_model.encode([question])
 
     # Search the three most relevant chunks
     distances, indices = search_vector_index(
