@@ -2,6 +2,14 @@
 
 An AI-powered chatbot that allows students to upload university PDF notes and ask questions about their content.
 
+👨‍💻 Author
+
+Khushi Panchani
+
+Information Technology Student
+
+Interested in Artificial Intelligence, Machine Learning, Software Development, and emerging technologies.
+
 The project uses **Retrieval-Augmented Generation (RAG)** to retrieve relevant information from the uploaded PDF and uses **Google Gemini** to generate a clear and structured answer.
 
 ## 🚀 Live Demo
