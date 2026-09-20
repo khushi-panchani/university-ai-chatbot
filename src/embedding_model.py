@@ -1,8 +1,5 @@
 
-
-from sentence_transformers import SentenceTransformer
-
-# Model will be loaded only when needed
+# Model is not imported or loaded when the server starts
 model = None
 
 
@@ -11,10 +8,15 @@ def get_embedding_model():
 
     if model is None:
         print("Loading embedding model...")
+
+        # Import only when the model is actually needed
+        from sentence_transformers import SentenceTransformer
+
         model = SentenceTransformer(
             "all-MiniLM-L6-v2",
             device="cpu"
         )
+
         print("Embedding model loaded successfully!")
 
     return model
