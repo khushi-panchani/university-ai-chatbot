@@ -1,4 +1,5 @@
 import os
+import time
 
 from dotenv import load_dotenv
 from google import genai
@@ -11,28 +12,24 @@ from src.vector_store import (
     search_vector_index
 )
 
-
-# Load API key
 load_dotenv()
 
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
-    raise ValueError("GEMINI_API_KEY not found in .env file")
+    raise ValueError("GEMINI_API_KEY not found")
 
 client = genai.Client(api_key=api_key)
 
-
-# These variables store the current PDF data
 chunks = []
 index = None
 
 
-def load_pdf(pdf_path):
-    """
-    Loads the uploaded PDF and prepares it for questions.
-    """
+# --------------------------------------------------
+# Load PDF and create FAISS index
+# --------------------------------------------------
 
+def load_pdf(pdf_path):
     global chunks, index
 
     print("Loading uploaded PDF...")
@@ -50,6 +47,7 @@ def load_pdf(pdf_path):
     print("Generating embeddings...")
 
     embedding_model = get_embedding_model()
+
     embeddings = embedding_model.encode(chunks)
 
     print("Embeddings generated successfully!")
@@ -63,11 +61,67 @@ def load_pdf(pdf_path):
     return True
 
 
+# --------------------------------------------------
+# Ask Gemini with automatic retry
+# --------------------------------------------------
+
+def generate_gemini_answer(prompt):
+
+    max_attempts = 3
+
+    for attempt in range(1, max_attempts + 1):
+
+        try:
+            print(f"Sending question to Gemini... Attempt {attempt}/{max_attempts}")
+
+            response = client.models.generate_content(
+                model="gemini-3.6-flash",
+                contents=prompt
+            )
+
+            print("Answer generated successfully!")
+
+            return response.text
+
+        except Exception as error:
+
+            error_message = str(error)
+
+            # Retry only temporary errors
+            temporary_error = (
+                "503" in error_message
+                or "UNAVAILABLE" in error_message
+                or "429" in error_message
+                or "RESOURCE_EXHAUSTED" in error_message
+                or "high demand" in error_message.lower()
+            )
+
+            if temporary_error and attempt < max_attempts:
+
+                wait_time = 2 ** attempt
+
+                print(
+                    f"Gemini temporarily unavailable. "
+                    f"Retrying in {wait_time} seconds..."
+                )
+
+                time.sleep(wait_time)
+
+            else:
+
+                print("Gemini request failed.")
+
+                return (
+                    "The AI service is temporarily busy. "
+                    "Please try again in a moment."
+                )
+
+
+# --------------------------------------------------
+# Get answer from uploaded PDF
+# --------------------------------------------------
+
 def get_answer(question):
-    """
-    Takes a question and returns a detailed answer
-    from the uploaded university PDF.
-    """
 
     global chunks, index
 
@@ -79,26 +133,30 @@ def get_answer(question):
     if index is None or not chunks:
         return "Please upload a PDF first."
 
-    # Convert the question into an embedding
+    # Create embedding for user's question
     embedding_model = get_embedding_model()
+
     query_embedding = embedding_model.encode([question])
 
-    # Search the three most relevant chunks
+    # Search FAISS
     distances, indices = search_vector_index(
         index,
         query_embedding,
         k=3
     )
 
-    # Collect the retrieved chunks
+    # Get retrieved chunks
     retrieved_chunks = [
-        chunks[i] for i in indices[0]
+        chunks[i]
+        for i in indices[0]
     ]
 
-    # Combine the chunks into one context
     context = "\n\n".join(retrieved_chunks)
 
-    # Detailed answer prompt
+    # --------------------------------------------------
+    # Prompt for Gemini
+    # --------------------------------------------------
+
     prompt = f"""
 You are a helpful university notes chatbot.
 
@@ -122,6 +180,7 @@ Do not create an example that is not supported by the context.
 Give 2 or 3 important points about the topic.
 
 Rules:
+
 - Use simple university-level language.
 - Give a slightly detailed answer.
 - Use headings and bullet points where helpful.
@@ -129,22 +188,19 @@ Rules:
 - Do not mention chunks, embeddings, FAISS, retrieval, or the AI system.
 - Do not give information that is not present in the uploaded PDF.
 - If the answer is not available in the context, say:
-  "I could not find this information in the uploaded PDF."
+
+"I could not find this information in the uploaded PDF."
 
 Context from the uploaded PDF:
+
 {context}
 
 User Question:
+
 {question}
 """
 
-    print("Sending question to Gemini...")
+    # Send prompt to Gemini with retry
+    answer = generate_gemini_answer(prompt)
 
-    response = client.models.generate_content(
-        model="gemini-3.6-flash",
-        contents=prompt
-    )
-
-    print("Answer generated successfully!")
-
-    return response.text
+    return answer
