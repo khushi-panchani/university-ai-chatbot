@@ -67,15 +67,23 @@ def load_pdf(pdf_path):
 
 def generate_gemini_answer(prompt):
 
-    max_attempts = 3
+    # First model
+    primary_model = "gemini-3.6-flash"
 
-    for attempt in range(1, max_attempts + 1):
+    # Backup model
+    fallback_model = "gemini-3.5-flash-lite"
+
+    # Try primary model 2 times
+    for attempt in range(1, 3):
 
         try:
-            print(f"Sending question to Gemini... Attempt {attempt}/{max_attempts}")
+            print(
+                f"Sending question to Gemini... "
+                f"{primary_model} Attempt {attempt}/2"
+            )
 
             response = client.models.generate_content(
-                model="gemini-3.6-flash",
+                model=primary_model,
                 contents=prompt
             )
 
@@ -87,7 +95,6 @@ def generate_gemini_answer(prompt):
 
             error_message = str(error)
 
-            # Retry only temporary errors
             temporary_error = (
                 "503" in error_message
                 or "UNAVAILABLE" in error_message
@@ -96,26 +103,50 @@ def generate_gemini_answer(prompt):
                 or "high demand" in error_message.lower()
             )
 
-            if temporary_error and attempt < max_attempts:
-
-                wait_time = 2 ** attempt
+            if temporary_error and attempt < 2:
 
                 print(
-                    f"Gemini temporarily unavailable. "
-                    f"Retrying in {wait_time} seconds..."
+                    "Gemini temporarily unavailable. "
+                    "Retrying in 3 seconds..."
                 )
 
-                time.sleep(wait_time)
+                time.sleep(3)
 
             else:
-
-                print("Gemini request failed.")
-
-                return (
-                    "The AI service is temporarily busy. "
-                    "Please try again in a moment."
+                print(
+                    f"{primary_model} failed. "
+                    f"Trying fallback model..."
                 )
 
+    # --------------------------------------------------
+    # Fallback model
+    # --------------------------------------------------
+
+    try:
+
+        print(
+            f"Trying fallback model: {fallback_model}"
+        )
+
+        response = client.models.generate_content(
+            model=fallback_model,
+            contents=prompt
+        )
+
+        print("Fallback model generated answer successfully!")
+
+        return response.text
+
+    except Exception as error:
+
+        print(
+            f"Fallback Gemini model also failed: {error}"
+        )
+
+        return (
+            "The AI service is temporarily unavailable. "
+            "Please try again in a few moments."
+        )
 
 # --------------------------------------------------
 # Get answer from uploaded PDF
