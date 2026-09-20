@@ -1,55 +1,50 @@
+import os
+import numpy as np
+from dotenv import load_dotenv
+from huggingface_hub import InferenceClient
 
-# Model is not imported or loaded when the server starts
-model = None
+load_dotenv()
+
+HF_TOKEN = os.getenv("HF_TOKEN")
+
+if not HF_TOKEN:
+    raise ValueError("HF_TOKEN not found in .env file")
+
+
+# Connect to Hugging Face Inference API
+client = InferenceClient(
+    provider="hf-inference",
+    api_key=HF_TOKEN
+)
+
+MODEL_NAME = "BAAI/bge-small-en-v1.5"
+
+
+class HFEmbeddingModel:
+
+    def encode(self, texts):
+
+        # Convert single text into a list
+        if isinstance(texts, str):
+            texts = [texts]
+
+        embeddings = client.feature_extraction(
+            texts,
+            model=MODEL_NAME
+        )
+
+        # Convert result into NumPy array
+        return np.asarray(embeddings, dtype="float32")
+
+
+# Create embedding model
+model = HFEmbeddingModel()
 
 
 def get_embedding_model():
-    global model
-
-    if model is None:
-        print("Loading embedding model...")
-
-        # Import only when the model is actually needed
-        from sentence_transformers import SentenceTransformer
-
-        model = SentenceTransformer(
-            "all-MiniLM-L6-v2",
-            device="cpu"
-        )
-
-        print("Embedding model loaded successfully!")
-
     return model
 
 
 def create_embedding(text):
     embedding_model = get_embedding_model()
-
-    embedding = embedding_model.encode(text)
-
-    return embedding
-
-
-# from sentence_transformers import SentenceTransformer
-
-
-# # Load the pretrained embedding model
-# model = SentenceTransformer("all-MiniLM-L6-v2")
-
-
-# # Our first test sentence
-# sentence = "What is an Entity in DBMS?"
-
-
-# # Convert sentence into an embedding vector
-# embedding = model.encode(sentence)
-
-
-# # Display the result
-# print("Embedding created successfully!")
-
-# print("Embedding type:", type(embedding))
-
-# print("Embedding shape:", embedding.shape)
-
-# print("First 10 numbers:", embedding[:10])
+    return embedding_model.encode(text)
